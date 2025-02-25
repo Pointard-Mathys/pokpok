@@ -1,0 +1,9 @@
+numpy==2.2.1
+pandas==2.2.3
+requests==2.32.3
+scikit-learn==1.6.1
+streamlit==1.41.1
+torch==2.6.0
+torchvision
+mlflow==2.20.2
+pillow==11.1.0

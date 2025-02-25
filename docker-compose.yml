@@ -43,6 +43,22 @@ services:
       --host 0.0.0.0 --port 5000
     restart: unless-stopped
 
+  streamlit_app:
+    build:
+      context: ./webapp
+    ports:
+      - "8501:8501"
+    depends_on:
+      - fastapi_app
+
+  fastapi_app:
+    build:
+      context: ./serving
+    volumes:
+      - ./artifacts:/artifacts
+    ports:
+      - "8080:8080"
+
 volumes:
   grafana-data:
   prometheus-data:
