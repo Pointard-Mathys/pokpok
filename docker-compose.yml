@@ -1,3 +1,54 @@
+# version: '3.8'
+
+# services:
+#   grafana:
+#     image: grafana/grafana:latest
+#     container_name: grafana
+#     ports:
+#       - "3000:3000"
+#     volumes:
+#       - grafana-data:/var/lib/grafana
+#     environment:
+#       - GF_SECURITY_ADMIN_USER=admin
+#       - GF_SECURITY_ADMIN_PASSWORD=admin
+#     restart: unless-stopped
+
+#   prometheus:
+#     image: prom/prometheus:latest
+#     container_name: prometheus
+#     ports:
+#       - "9090:9090"
+#     volumes:
+#       - prometheus-data:/etc/prometheus
+#     command:
+#       - "--config.file=/etc/prometheus/prometheus.yml"
+#     restart: unless-stopped
+
+
+#   mlflow:
+#     image: ghcr.io/mlflow/mlflow:v2.9.2
+#     container_name: mlflow
+#     ports:
+#       - "5000:5000"
+#     volumes:
+#       - mlflow-data:/mlflow
+#       - ./mlflow:/mlflow_store  # Stockage des artefacts en local
+#     environment:
+#       - MLFLOW_TRACKING_URI=http://mlflow:5000
+#       - MLFLOW_BACKEND_STORE_URI=sqlite:///mlflow_store/mlflow.db
+#       - MLFLOW_ARTIFACT_ROOT=/mlflow_store/artifacts
+#     command: >
+#       mlflow server --backend-store-uri sqlite:///mlflow_store/mlflow.db 
+#       --default-artifact-root /mlflow_store/artifacts 
+#       --host 0.0.0.0 --port 5000
+#     restart: unless-stopped
+
+# volumes:
+#   grafana-data:
+#   prometheus-data:
+#   mlflow-data:
+
+
 version: '3.8'
 
 services:
@@ -12,6 +63,8 @@ services:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
     restart: unless-stopped
+    networks:
+      - monitoring
 
   prometheus:
     image: prom/prometheus:latest
@@ -20,10 +73,12 @@ services:
       - "9090:9090"
     volumes:
       - prometheus-data:/etc/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
     restart: unless-stopped
-
+    networks:
+      - monitoring
 
   mlflow:
     image: ghcr.io/mlflow/mlflow:v2.9.2
@@ -32,7 +87,7 @@ services:
       - "5000:5000"
     volumes:
       - mlflow-data:/mlflow
-      - ./mlflow:/mlflow_store  # Stockage des artefacts en local
+      - ./mlflow:/mlflow_store
     environment:
       - MLFLOW_TRACKING_URI=http://mlflow:5000
       - MLFLOW_BACKEND_STORE_URI=sqlite:///mlflow_store/mlflow.db
@@ -42,8 +97,13 @@ services:
       --default-artifact-root /mlflow_store/artifacts 
       --host 0.0.0.0 --port 5000
     restart: unless-stopped
+    networks:
+      - monitoring
 
 volumes:
   grafana-data:
   prometheus-data:
   mlflow-data:
+
+networks:
+  monitoring:
